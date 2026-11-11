@@ -7,7 +7,7 @@ st.set_page_config(page_title="EDRunners-Gestor", page_icon="🛒", layout="wide
 
 # ================= CONEXIÓN A GOOGLE SHEETS =================
 @st.cache_resource
-def import streamlit as st
+import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
 
