@@ -47,7 +47,7 @@ with col1:
         
         col_cat, col_esp = st.columns(2)
         with col_cat:
-            categoria = st.selectbox("Categoría", ["celular", "tv", "gaming", "accesorio", "belleza", "ventilador", "faro led", "camara", "electronica"])
+            categoria = st.selectbox("Categoría", ["celular", "tv", "gaming", "accesorio", "belleza", "ventilador", "faro led", "camara", "electronica", "herramientas", "hogar", "quincalleria", "bolsos", "accesorios", "computacion", "jueguetes", "motocicleta"])
         with col_esp:
             especificaciones = st.text_input("Especificaciones cortas (Ej: 128GB / 4GB RAM)")
             
