@@ -6,24 +6,24 @@ from google.oauth2.service_account import Credentials
 st.set_page_config(page_title="EDRunners-Gestor", page_icon="🛒", layout="wide")
 
 # ================= CONEXIÓN A GOOGLE SHEETS =================
-import streamlit as st
-import gspread
-from google.oauth2.service_account import Credentials
-
-# ... (el resto de tu código de configuración visual)
-
 @st.cache_resource
 def conectar_sheets():
     scope = [
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    # ✅ CAMBIO: Lee las credenciales desde st.secrets
     creds_dict = dict(st.secrets["gcp_service_account"])
     creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
     client = gspread.authorize(creds)
-    sheet = client.open("EDRunners").worksheet("productos")
-    return sheet
+    hoja = client.open("EDRunners").worksheet("productos")
+    return hoja
+
+# ✅ EL ERROR ESTABA AQUÍ: Faltaba ejecutar la función y guardarla en la variable 'sheet'
+try:
+    sheet = conectar_sheets()
+except Exception as e:
+    st.error(f"Error de conexión con Google Sheets: {e}")
+    st.stop() # Detiene la app si no hay conexión
 
 # ================= DISEÑO VISUAL =================
 st.markdown("""
@@ -58,11 +58,9 @@ with col1:
         with col_util:
             utilidad = st.number_input("Utilidad ($)", min_value=0.0, step=0.5)
         with col_detal:
-            # Cálculo visual automático
             precio_detal_visual = costo + utilidad
             st.metric("Precio Detal", f"${precio_detal_visual:.2f}")
         with col_mayor:
-            # Cálculo visual automático del 10% de descuento
             precio_mayor_visual = precio_detal_visual * 0.9
             st.metric("Precio Mayor", f"${precio_mayor_visual:.2f}")
 
@@ -93,18 +91,19 @@ if submit_button:
                 nuevo_orden_num = len(productos_reales) + 1
                 fila = nuevo_orden_num + 1
 
+                # ⚠️ NOTA: Usamos fórmulas en inglés (IF, UPPER, ROUND) para que Google Sheets no de error al insertarlas.
                 nueva_fila = [
                     nuevo_orden_num,
-                    f'=SI(C{fila}=""; ""; MAYUSC(IZQUIERDA(C{fila}; 3)) & "-" & TEXTO(A{fila}; "000"))',
+                    f'=IF(C{fila}="", "", UPPER(LEFT(C{fila}, 3)) & "-" & TEXT(A{fila}, "000"))',
                     nombre,
                     categoria,
                     especificaciones,
                     costo,
                     utilidad,
                     f'=F{fila}+G{fila}',
-                    f'=H{fila}*(1-0,10)',
+                    f'=H{fila}*(1-0.10)',
                     f'=H{fila}',
-                    f'=REDONDEAR(J{fila}*$S$2; 2)', # Asegúrate que B1 es la tasa
+                    f'=ROUND(J{fila}*$S$2, 2)', # Asume que la tasa está en S2
                     stock,
                     etiqueta,
                     imagen_url,
@@ -114,9 +113,10 @@ if submit_button:
                     ""
                 ]
                 
+                # ✅ Aquí ya existe 'sheet' y no dará error
                 sheet.append_row(nueva_fila, value_input_option='USER_ENTERED')
                 st.success(f"🎉 ¡Producto '{nombre}' agregado exitosamente a la hoja!")
-                st.balloons() # Efecto visual de celebración
+                st.balloons()
             except Exception as e:
                 st.error(f"❌ Error al guardar: {e}")
 
@@ -126,7 +126,6 @@ with col2:
     st.markdown("---")
     st.subheader("📋 Últimos 5 productos")
     try:
-        # Obtener los últimos 5 registros para la vista previa
         registros = sheet.get_all_records()
         ultimos = registros[-5:] if len(registros) >= 5 else registros
         for prod in reversed(ultimos):
