@@ -71,7 +71,7 @@ with col1:
         with col_etiqueta:
             etiqueta = st.selectbox("Etiqueta Visual", ["", "NUEVO", "OFERTA", "TOP"])
             
-        imagen_url = st.text_input("URL de la Imagen (ImgBB)")
+        imagen_url = st.text_input("URL de la Imagen (Web)")
         descripcion = st.text_area("Descripción del Producto (Opcional)")
         relacionados = st.text_input("IDs Relacionados (Opcional - ej: SAM-001, TVB-002)")
 
