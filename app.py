@@ -94,16 +94,16 @@ if submit_button:
                 # ⚠️ NOTA: Usamos fórmulas en inglés (IF, UPPER, ROUND) para que Google Sheets no de error al insertarlas.
                 nueva_fila = [
                     nuevo_orden_num,
-                    f'=IF(C{fila}="", "", UPPER(LEFT(C{fila}, 3)) & "-" & TEXT(A{fila}, "000"))',
+                    f'=IF(C{fila}=""; ""; UPPER(LEFT(C{fila}; 3)) & "-" & TEXT(A{fila}; "000"))',
                     nombre,
                     categoria,
                     especificaciones,
                     costo,
                     utilidad,
                     f'=F{fila}+G{fila}',
-                    f'=H{fila}*(1-0.10)',
+                    f'=H{fila}*(1-0,10)',
                     f'=H{fila}',
-                    f'=ROUND(J{fila}*$S$2, 2)', # Asume que la tasa está en S2
+                    f'=ROUND(J{fila}*$S$2; 2)', # Asume que la tasa está en S2
                     stock,
                     etiqueta,
                     imagen_url,
